@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config option here*/
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   turbopack: {
     rules: {
       "*.css": {

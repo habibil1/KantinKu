@@ -51,8 +51,8 @@ export const menu: Menu[] = [
   },
 ];
 
-// Alias untuk fleksibilitas import
 export const Menu = menu;
+export const menuKantin = menu;
 
 export function rupiah(n: number) {
   return "Rp " + n.toLocaleString("id-ID");

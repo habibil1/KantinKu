@@ -6,51 +6,54 @@ export type Menu = {
   stok: number;
 };
 
-export const Menu: Menu[] = [
+export const menu: Menu[] = [
   {
     id: 1,
-    nama: "Nasi Goreng spesial",
+    nama: "Nasi Goreng",
     kategori: "Makanan",
-    harga: 12000,
-    stok: 15,
+    harga: 15000,
+    stok: 10,
   },
   {
     id: 2,
-    nama: "Es Teh Manis",
-    kategori: "Minuman",
-    harga: 3000,
-    stok: 40,
+    nama: "Mie Goreng",
+    kategori: "Makanan",
+    harga: 12000,
+    stok: 12,
   },
   {
     id: 3,
-    nama: "Jus Alpukat",
+    nama: "Teh",
     kategori: "Minuman",
-    harga: 5000,
-    stok: 0,
-  },
-  {
-    id: 4,
-    nama: "Pisang Goreng",
-    kategori: "Makanan",
     harga: 5000,
     stok: 20,
   },
   {
+    id: 4,
+    nama: "Kopi",
+    kategori: "Minuman",
+    harga: 7000,
+    stok: 15,
+  },
+  {
     id: 5,
-    nama: "Risol Mayo",
-    kategori: "Makanan",
-    harga: 3000,
-    stok: 3,
+    nama: "esjeruk",
+    kategori: "Minuman",
+    harga: 5000,
+    stok: 15,
   },
   {
     id: 6,
-    nama: "Mie Ayam",
+    nama: "basreng",
     kategori: "Makanan",
-    harga: 10000,
-    stok: 8,
+    harga: 8000,
+    stok: 15,
   },
 ];
 
+// Alias untuk fleksibilitas import
+export const Menu = menu;
+
 export function rupiah(n: number) {
-  return "rp " + n.toLocaleString("id-ID");
+  return "Rp " + n.toLocaleString("id-ID");
 }

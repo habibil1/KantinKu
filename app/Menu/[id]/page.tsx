@@ -1,8 +1,13 @@
 "use client";
-
 import { useState, use } from "react";
+import { menu, rupiah } from "@/data/menu";
 import { notFound } from "next/navigation";
-import { menuKantin } from "@/data/menu";
+import Link from "next/link";
+
+type ItemKeranjang = {
+  id: number;
+  jumlah: number;
+};
 
 export default function DetailMenu({
   params,
@@ -10,124 +15,111 @@ export default function DetailMenu({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const menu = menuKantin.find((m) => m.id === Number(id));
+  const menuId = Number(id);
+  const item = menu.find((m) => m.id === menuId);
 
-  const [jumlah, setJumlah] = useState(1);
-  const [pesan, setPesan] = useState("");
-
-  if (!menu) {
+  if (!item) {
     notFound();
-    return null;
   }
 
-  const totalHarga = menu.harga * jumlah;
+  // Ambil data keranjang saat ini dari localStorage untuk hitung stok yang sudah dipesan
+  const [jumlah, setJumlah] = useState(1);
+  const [pesan, setPesan] = useState("");
+  const [berhasil, setBerhasil] = useState(false);
 
-  const handleTambahKeKeranjang = () => {
+  const keranjang: ItemKeranjang[] = JSON.parse(
+    typeof window !== "undefined"
+      ? (localStorage.getItem("keranjang") ?? "[]")
+      : "[]",
+  );
+
+  const existing = keranjang.find((k) => k.id === item.id);
+  const jumlahDiKeranjang = existing ? existing.jumlah : 0;
+  const sisaStok = item.stok - jumlahDiKeranjang;
+
+  function tambahKeKeranjang(e: React.FormEvent) {
+    e.preventDefault();
+    if (!item) return;
+    setBerhasil(false);
+
     if (jumlah < 1) {
-      setPesan("Gagal: Jumlah minimal 1.");
-      return;
+      return setPesan("Jumlah minimal 1.");
+    }
+    if (jumlah > sisaStok) {
+      return setPesan(`Stok tidak cukup. Sisa stok tersedia: ${sisaStok}.`);
     }
 
-    const keranjangLama = localStorage.getItem("keranjang");
-    const keranjang = keranjangLama ? JSON.parse(keranjangLama) : [];
+    setPesan("");
 
-    const indexMenu = keranjang.findIndex(
-      (item: { id: number; jumlah: number }) => item.id === menu.id,
-    );
-    let jumlahSudahAda = 0;
+    // Update keranjang di localStorage
+    const index = keranjang.findIndex((k) => k.id === item.id);
+    const keranjangBaru =
+      index !== -1
+        ? keranjang.map((k, i) =>
+            i === index ? { ...k, jumlah: k.jumlah + jumlah } : k,
+          )
+        : [...keranjang, { id: item.id, jumlah }];
 
-    if (indexMenu !== -1) {
-      jumlahSudahAda = keranjang[indexMenu].jumlah;
-    }
-
-    if (jumlah + jumlahSudahAda > menu.stok) {
-      setPesan(
-        `Gagal: Stok tidak cukup. Kamu sudah memasukkan ${jumlahSudahAda} porsi ke keranjang sebelumnya.`,
-      );
-      return;
-    }
-
-    if (indexMenu !== -1) {
-      keranjang[indexMenu].jumlah += jumlah;
-    } else {
-      keranjang.push({ id: menu.id, jumlah: jumlah });
-    }
-
-    localStorage.setItem("keranjang", JSON.stringify(keranjang));
-
-    window.dispatchEvent(new Event("keranjang-berubah"));
-
-    setPesan("Ditambahkan ke keranjang.");
-  };
+    localStorage.setItem("keranjang", JSON.stringify(keranjangBaru));
+    setBerhasil(true);
+  }
 
   return (
-    <div className="max-w-xl mx-auto border rounded-xl p-6 bg-white mt-10 shadow-sm">
-      <h1 className="text-3xl font-bold mb-2">{menu.nama}</h1>
-      <p className="text-gray-500 mb-4">{menu.kategori}</p>
+    <div className="mx-auto max-w-xl rounded-xl border bg-white p-6 shadow-sm">
+      <Link href="/menu" className="text-sm text-orange-600 hover:underline">
+        &larr; Kembali ke Menu
+      </Link>
 
-      <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-6">
-        <span className="text-2xl font-bold text-blue-600">
-          Rp {menu.harga.toLocaleString("id-ID")}
-        </span>
-        <span
-          className={`font-semibold ${
-            menu.stok === 0 ? "text-red-500" : "text-green-600"
-          }`}
+      <span className="mt-4 inline-block rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
+        {item.kategori}
+      </span>
+      <h1 className="mt-2 text-2xl font-bold">{item.nama}</h1>
+      <p className="mt-2 text-xl font-semibold text-slate-900">
+        {rupiah(item.harga)}
+      </p>
+
+      <p
+        className={`mt-2 text-sm ${item.stok === 0 ? "text-red-600 font-semibold" : "text-green-700"}`}
+      >
+        {item.stok === 0
+          ? "Stok habis"
+          : `Stok total: ${item.stok} (Di keranjangmu: ${jumlahDiKeranjang})`}
+      </p>
+
+      {item.stok === 0 ? (
+        <p className="mt-6 font-medium text-red-600">Menu ini habis.</p>
+      ) : (
+        <form
+          onSubmit={tambahKeKeranjang}
+          className="mt-6 space-y-4 border-t pt-4"
         >
-          {menu.stok === 0 ? "Habis" : `Sisa Stok: ${menu.stok}`}
-        </span>
-      </div>
-
-      <div className="border-t pt-6 mt-4">
-        {menu.stok === 0 ? (
-          <p className="text-red-500 font-bold text-lg text-center bg-red-50 p-3 rounded-lg">
-            Menu ini habis.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <label htmlFor="jumlah" className="font-medium text-lg">
-                Jumlah:
-              </label>
-              <input
-                type="number"
-                id="jumlah"
-                min="1"
-                max={menu.stok}
-                value={jumlah}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  setJumlah(isNaN(val) ? 0 : val);
-                }}
-                className="border p-2 rounded-lg w-24 text-center text-lg"
-              />
-            </div>
-
-            <div className="text-xl font-semibold mb-2">
-              Total Harga: Rp {totalHarga.toLocaleString("id-ID")}
-            </div>
-
-            <button
-              onClick={handleTambahKeKeranjang}
-              className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-bold w-full transition"
-            >
-              Tambah ke keranjang
-            </button>
-
-            {pesan && (
-              <p
-                className={`font-medium p-3 rounded-lg text-center ${
-                  pesan.includes("Gagal")
-                    ? "bg-red-50 text-red-600"
-                    : "bg-green-50 text-green-600"
-                }`}
-              >
-                {pesan}
-              </p>
-            )}
+          <h2 className="text-lg font-semibold">Pesan menu</h2>
+          <div>
+            <label className="block text-sm text-slate-600 mb-1">Jumlah:</label>
+            <input
+              type="number"
+              value={jumlah}
+              onChange={(e) => setJumlah(Number(e.target.value))}
+              className="block w-32 rounded border px-3 py-2 text-slate-800"
+            />
           </div>
-        )}
-      </div>
+          <p className="font-medium">
+            Total Subtotal:{" "}
+            <span className="text-orange-600">
+              {rupiah(item.harga * jumlah)}
+            </span>
+          </p>
+          {pesan && <p className="text-sm text-red-600 font-medium">{pesan}</p>}
+          {berhasil && (
+            <p className="text-sm text-green-700 font-medium">
+              Ditambahkan ke keranjang.
+            </p>
+          )}
+          <button className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 transition">
+            Tambah ke keranjang
+          </button>
+        </form>
+      )}
     </div>
   );
 }

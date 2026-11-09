@@ -7,48 +7,12 @@ export type Menu = {
 };
 
 export const menu: Menu[] = [
-  {
-    id: 1,
-    nama: "Nasi Goreng",
-    kategori: "Makanan",
-    harga: 15000,
-    stok: 10,
-  },
-  {
-    id: 2,
-    nama: "Mie Goreng",
-    kategori: "Makanan",
-    harga: 12000,
-    stok: 12,
-  },
-  {
-    id: 3,
-    nama: "Teh",
-    kategori: "Minuman",
-    harga: 5000,
-    stok: 20,
-  },
-  {
-    id: 4,
-    nama: "Kopi",
-    kategori: "Minuman",
-    harga: 7000,
-    stok: 15,
-  },
-  {
-    id: 5,
-    nama: "esjeruk",
-    kategori: "Minuman",
-    harga: 5000,
-    stok: 15,
-  },
-  {
-    id: 6,
-    nama: "basreng",
-    kategori: "Makanan",
-    harga: 8000,
-    stok: 15,
-  },
+  { id: 1, nama: "Nasi Goreng Spesial", kategori: "Makanan", harga: 12000, stok: 15 },
+  { id: 2, nama: "Mie Ayam", kategori: "Makanan", harga: 10000, stok: 8 },
+  { id: 3, nama: "Es Teh Manis", kategori: "Minuman", harga: 3000, stok: 40 },
+  { id: 4, nama: "Jus Alpukat", kategori: "Minuman", harga: 8000, stok: 0 },
+  { id: 5, nama: "Pisang Goreng", kategori: "Camilan", harga: 5000, stok: 20 },
+  { id: 6, nama: "Risol Mayo", kategori: "Camilan", harga: 4000, stok: 3 },
 ];
 
 export const Menu = menu;

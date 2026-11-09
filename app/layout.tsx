@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen antialiased bg-gray-50 text-gray-900" suppressHydrationWarning>
         <Navbar />
-        <main className="pt-20 px-4">{children}</main>
+        <main className="max-w-5xl mx-auto py-8 px-4">{children}</main>
       </body>
     </html>
   );

@@ -20,4 +20,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
-//commit//
+//commit/

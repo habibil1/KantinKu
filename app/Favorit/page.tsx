@@ -10,15 +10,14 @@ export default function HalamanFavorit() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem("favorit") ?? "[]");
-    setFavIds(favs);
-
     fetch("/api/menu")
       .then((res) => {
         if (!res.ok) throw new Error("Gagal mengambil data");
         return res.json();
       })
       .then((data) => {
+        const favs = JSON.parse(localStorage.getItem("favorit") ?? "[]");
+        setFavIds(favs);
         setMenus(data);
         setLoading(false);
       })
@@ -32,6 +31,7 @@ export default function HalamanFavorit() {
     return (
       <div className="py-12 text-center text-lg text-slate-500">Memuat...</div>
     );
+
   if (error)
     return (
       <div className="py-12 text-center text-lg text-red-500">
@@ -50,9 +50,9 @@ export default function HalamanFavorit() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-6xl">
       <h1 className="text-2xl font-bold mb-6">Menu Favorit</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {menuFavorit.map((item) => (
           <KartuMenu key={item.id} item={item} />
         ))}

@@ -7,7 +7,8 @@ export default function Home() {
         Selamat Datang di KantinKu
       </h1>
       <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
-        Pesan makanan dan minuman favoritmu dari kantin sekolah dengan mudah, cepat, dan praktis!
+        Pesan makanan dan minuman favoritmu dari kantin sekolah dengan mudah,
+        cepat, dan praktis!
       </p>
       <Link
         href="/menu"

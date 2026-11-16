@@ -6,11 +6,28 @@ import Link from "next/link";
 type ItemKeranjang = { id: number; jumlah: number };
 type ItemDetail = ItemKeranjang & { item: Menu };
 
+type StrukItem = {
+  namaItem: string;
+  jumlah: number;
+  subTotalItem: number;
+};
+
+type Struk = {
+  nama: string;
+  kelas: string;
+  caraAmbil: string;
+  subtotal: number;
+  diskon: number;
+  ongkir: number;
+  total: number;
+  items: StrukItem[];
+  waktu: string;
+};
+
 export default function HalamanKeranjang() {
   const [keranjang, setKeranjang] = useState<ItemKeranjang[]>([]);
   const [menuList, setMenuList] = useState<Menu[]>([]);
 
-  // State Promo & Checkout
   const [inputPromo, setInputPromo] = useState("");
   const [promoAktif, setPromoAktif] = useState(false);
   const [pesanPromo, setPesanPromo] = useState("");
@@ -18,15 +35,17 @@ export default function HalamanKeranjang() {
   const [nama, setNama] = useState("");
   const [kelas, setKelas] = useState("");
   const [pesanError, setPesanError] = useState("");
-  const [struk, setStruk] = useState<any>(null); // Menyimpan data struk jika berhasil checkout
+  const [struk, setStruk] = useState<Struk | null>(null);
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("keranjang") ?? "[]");
-    setKeranjang(data);
-    setMenuList(menu);
+    const timer = setTimeout(() => {
+      const data = JSON.parse(localStorage.getItem("keranjang") ?? "[]");
+      setKeranjang(data);
+      setMenuList(menu);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Simpan keranjang dan picu event agar Navbar tahu (Poin 15)
   function simpanKeranjang(baru: ItemKeranjang[]) {
     setKeranjang(baru);
     localStorage.setItem("keranjang", JSON.stringify(baru));
@@ -55,13 +74,11 @@ export default function HalamanKeranjang() {
     .map((k) => ({ ...k, item: menuList.find((m) => m.id === k.id)! }))
     .filter((k) => k.item !== undefined);
 
-  // Perhitungan Subtotal, Diskon, Ongkir, Total
   const subtotal = daftarBelanja.reduce(
     (acc, cur) => acc + cur.item.harga * cur.jumlah,
     0,
   );
 
-  // Validasi Promo: otomatis batal jika subtotal turun di bawah 20.000
   const diskon =
     promoAktif && subtotal >= 20000 ? Math.round(subtotal * 0.1) : 0;
   const ongkir = caraAmbil === "diantar" ? 2000 : 0;
@@ -91,7 +108,6 @@ export default function HalamanKeranjang() {
     if (caraAmbil === "diantar" && kelas.trim().length < 3)
       return setPesanError("Kelas minimal 3 karakter untuk pengantaran.");
 
-    // Buat data struk
     const dataStruk = {
       nama,
       kelas,
@@ -108,11 +124,9 @@ export default function HalamanKeranjang() {
       waktu: new Date().toLocaleString("id-ID"),
     };
 
-    // Simpan ke riwayat
     const riwayat = JSON.parse(localStorage.getItem("riwayat") ?? "[]");
     localStorage.setItem("riwayat", JSON.stringify([dataStruk, ...riwayat]));
 
-    // Bersihkan keranjang dan reset form
     setStruk(dataStruk);
     simpanKeranjang([]);
     setInputPromo("");
@@ -121,15 +135,14 @@ export default function HalamanKeranjang() {
     setKelas("");
   }
 
-  // Tampilan jika sudah checkout (Struk)
   if (struk) {
     return (
       <div className="mx-auto max-w-xl rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">
+        <h2 className="text-2xl font-bold text-blue-700 mb-4">
           Terima kasih, {struk.nama}!
         </h2>
         <div className="space-y-2 border-b pb-4 mb-4">
-          {struk.items.map((it: any, i: number) => (
+          {struk.items.map((it, i) => (
             <p key={i} className="flex justify-between">
               <span>
                 {it.namaItem} x{it.jumlah}
@@ -157,13 +170,13 @@ export default function HalamanKeranjang() {
             </span>
             <span>{rupiah(struk.ongkir)}</span>
           </p>
-          <p className="flex justify-between text-lg font-bold text-orange-600 mt-2">
+          <p className="flex justify-between text-lg font-bold text-blue-600 border-t pt-2 mt-2">
             <span>Total bayar:</span> <span>{rupiah(struk.total)}</span>
           </p>
         </div>
         <button
           onClick={() => setStruk(null)}
-          className="w-full rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
+          className="w-full rounded bg-blue-600 px-4 py-2.5 text-white font-medium hover:bg-blue-700 transition"
         >
           Kembali ke Keranjang
         </button>
@@ -177,7 +190,7 @@ export default function HalamanKeranjang() {
         <p className="text-slate-500 text-lg">Keranjang masih kosong.</p>
         <Link
           href="/menu"
-          className="mt-4 inline-block text-orange-600 hover:underline font-medium"
+          className="mt-4 inline-block text-blue-600 hover:underline font-medium"
         >
           Yuk pilih menu kantin &rarr;
         </Link>
@@ -187,14 +200,13 @@ export default function HalamanKeranjang() {
 
   return (
     <div className="mx-auto max-w-2xl rounded-xl border bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-bold mb-4">Keranjang Belanja</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900">Keranjang Belanja</h1>
 
-      {/* Daftar Item */}
       <ul className="divide-y divide-slate-200 mb-6 border-b pb-4">
         {daftarBelanja.map(({ id, jumlah, item }) => (
           <li key={id} className="py-4 flex items-center justify-between">
             <div>
-              <h3 className="font-semibold">{item.nama}</h3>
+              <h3 className="font-semibold text-gray-900">{item.nama}</h3>
               <p className="text-sm text-slate-500">
                 {rupiah(item.harga)} per porsi
               </p>
@@ -215,7 +227,7 @@ export default function HalamanKeranjang() {
                   +
                 </button>
               </div>
-              <span className="font-semibold w-24 text-right">
+              <span className="font-semibold text-blue-600 w-24 text-right">
                 {rupiah(item.harga * jumlah)}
               </span>
               <button
@@ -229,7 +241,6 @@ export default function HalamanKeranjang() {
         ))}
       </ul>
 
-      {/* Rincian Harga & Promo */}
       <div className="space-y-4 md:flex md:gap-8 md:space-y-0">
         <div className="flex-1 space-y-4">
           <form onSubmit={cekPromo} className="flex gap-2">
@@ -266,15 +277,14 @@ export default function HalamanKeranjang() {
               <span>Ongkir:</span> <span>{rupiah(ongkir)}</span>
             </p>
           )}
-          <p className="flex justify-between text-lg font-bold text-orange-600 border-t pt-2 mt-2">
+          <p className="flex justify-between text-lg font-bold text-blue-600 border-t pt-2 mt-2">
             <span>Total:</span> <span>{rupiah(total)}</span>
           </p>
         </div>
       </div>
 
-      {/* Form Checkout */}
       <form onSubmit={prosesPesanan} className="mt-8 space-y-4 border-t pt-6">
-        <h2 className="text-lg font-bold">Detail Pengiriman</h2>
+        <h2 className="text-lg font-bold text-gray-900">Detail Pengiriman</h2>
 
         <div className="flex gap-4 mb-2">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -319,7 +329,7 @@ export default function HalamanKeranjang() {
 
         <button
           type="submit"
-          className="w-full rounded bg-orange-600 px-4 py-3 font-bold text-white hover:bg-orange-700"
+          className="w-full rounded bg-blue-600 px-4 py-3 font-bold text-white hover:bg-blue-700 transition"
         >
           Pesan Sekarang
         </button>

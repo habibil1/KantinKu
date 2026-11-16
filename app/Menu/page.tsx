@@ -36,14 +36,14 @@ export default function MenuPage() {
           placeholder="Cari menu..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border p-2.5 rounded-lg w-full bg-white"
+          className="border p-2.5 rounded-lg w-full bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           suppressHydrationWarning
         />
 
         <select
           value={kategori}
           onChange={(e) => setKategori(e.target.value)}
-          className="border p-2.5 rounded-lg bg-white"
+          className="border p-2.5 rounded-lg bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           suppressHydrationWarning
         >
           <option value="Semua">Semua</option>
@@ -55,7 +55,7 @@ export default function MenuPage() {
         <select
           value={urutan}
           onChange={(e) => setUrutan(e.target.value)}
-          className="border p-2.5 rounded-lg bg-white"
+          className="border p-2.5 rounded-lg bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           suppressHydrationWarning
         >
           <option value="Urutan awal">Urutan awal</option>

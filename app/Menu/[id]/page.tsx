@@ -22,19 +22,23 @@ export default function DetailMenu({
     notFound();
   }
 
-  // --- State Favorit (Poin 16) ---
   const [isFavorit, setIsFavorit] = useState(false);
 
   useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem("favorit") ?? "[]");
-    setIsFavorit(favs.includes(menuId));
+    const timer = setTimeout(() => {
+      const favs: number[] = JSON.parse(
+        localStorage.getItem("favorit") ?? "[]",
+      );
+      setIsFavorit(favs.includes(menuId));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [menuId]);
 
   function toggleFavorit() {
     const favs: number[] = JSON.parse(localStorage.getItem("favorit") ?? "[]");
     let favsBaru;
     if (favs.includes(menuId)) {
-      favsBaru = favs.filter((id) => id !== menuId);
+      favsBaru = favs.filter((i) => i !== menuId);
     } else {
       favsBaru = [...favs, menuId];
     }
@@ -42,7 +46,6 @@ export default function DetailMenu({
     setIsFavorit(!isFavorit);
   }
 
-  // --- State Keranjang ---
   const [jumlah, setJumlah] = useState(1);
   const [pesan, setPesan] = useState("");
   const [berhasil, setBerhasil] = useState(false);
@@ -71,7 +74,6 @@ export default function DetailMenu({
 
     setPesan("");
 
-    // Update keranjang di localStorage
     const index = keranjang.findIndex((k) => k.id === item.id);
     const keranjangBaru =
       index !== -1
@@ -83,31 +85,29 @@ export default function DetailMenu({
     localStorage.setItem("keranjang", JSON.stringify(keranjangBaru));
     setBerhasil(true);
 
-    // Memberitahu navbar bahwa keranjang berubah (Poin 15)
     window.dispatchEvent(new Event("keranjang-berubah"));
   }
 
   return (
     <div className="mx-auto max-w-xl rounded-xl border bg-white p-6 shadow-sm">
-      <Link href="/menu" className="text-sm text-orange-600 hover:underline">
+      <Link href="/menu" className="text-sm text-blue-600 hover:underline">
         &larr; Kembali ke Menu
       </Link>
 
       <div className="mt-4 flex items-center justify-between">
-        <span className="inline-block rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
+        <span className="inline-block rounded bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
           {item.kategori}
         </span>
       </div>
 
-      <h1 className="mt-2 text-2xl font-bold">{item.nama}</h1>
-      <p className="mt-2 text-xl font-semibold text-slate-900">
+      <h1 className="mt-2 text-2xl font-bold text-gray-900">{item.nama}</h1>
+      <p className="mt-2 text-xl font-semibold text-blue-600">
         {rupiah(item.harga)}
       </p>
 
-      {/* Tombol Favorit (Poin 16) */}
       <button
         onClick={toggleFavorit}
-        className="mt-3 rounded border border-orange-600 px-3 py-1 text-sm font-medium text-orange-600 hover:bg-orange-50 transition"
+        className="mt-3 rounded border border-blue-600 px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 transition"
       >
         {isFavorit ? "♥ Favorit" : "♡ Tambah favorit"}
       </button>
@@ -139,7 +139,7 @@ export default function DetailMenu({
           </div>
           <p className="font-medium">
             Total Subtotal:{" "}
-            <span className="text-orange-600">
+            <span className="text-blue-600 font-bold">
               {rupiah(item.harga * jumlah)}
             </span>
           </p>
@@ -149,7 +149,7 @@ export default function DetailMenu({
               Ditambahkan ke keranjang.
             </p>
           )}
-          <button className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 transition">
+          <button className="rounded bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 transition">
             Tambah ke keranjang
           </button>
         </form>

@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-24 px-4">
       <h1 className="text-4xl md:text-5xl font-extrabold text-blue-600 mb-4">
-        Selamat Datang di KantinKu
+        Selamat Datang di Kantingw
       </h1>
       <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
         Pesan makanan dan minuman favoritmu dari kantin sekolah dengan mudah,
